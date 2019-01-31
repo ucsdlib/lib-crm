@@ -1,0 +1,496 @@
+<!-- Build script for Lib-CRM -->
+
+<project name="crm" default="webapp" basedir=".">
+
+<property file="build.properties"/>
+
+<property name="src"                 value="${basedir}/src"/>
+<property name="common.home"         value="${src}/common"/>
+<property name="build"               value="${basedir}/build"/>
+<property name="dist"                value="${basedir}/dist"/>
+<property name="api"                 value="${basedir}/doc/api"/>
+<property name="lib"                 value="${src}/lib"/>
+<property name="filtered"            value="${basedir}/filtered"/>
+<property name="test"                value="${basedir}/test"/>
+<property name="report"              value="${basedir}/report"/>
+
+<property name="appName"             value="crm"/>
+<property name="compile.debug"       value="true"/>
+<property name="compile.deprecation" value="true"/>
+
+<path id="classpath">        
+    <fileset dir="${lib}" id="local-jars">
+        <include name="*.jar"/>
+    </fileset>
+	<pathelement location="${build}/classes"/>
+</path> 
+	
+<property name="full_raw_file"        value="${test}/full_raw.txt"/>
+<property name="full_merge_file"      value="${test}/full_merge.txt"/>
+<property name="full_marc_file"       value="${test}/full_marc.txt"/>
+<property name="inc_raw_file"         value="${test}/inc_raw.txt"/>
+<property name="inc_merge_file"       value="${test}/inc_merge.txt"/>
+<property name="inc_marc_file"        value="${test}/inc_marc.txt"/>
+
+<property name="emp_full_raw_file"    value="${test}/emp_full_raw.txt"/>
+<property name="emp_full_raw_old"     value="${test}/emp_full_raw_old.txt"/>
+<property name="emp_active_raw_file"  value="${test}/emp_active_raw.txt"/>
+<property name="emp_inc_raw_file"     value="${test}/emp_inc_raw.txt"/>
+
+<!--======================================================================-->
+<!-- PREPARE -->
+<!--======================================================================-->
+<target name="prepare" description="Create needed folders">
+ <!-- Create the build directory structure -->
+ <mkdir dir="${build}/classes"/>
+ <mkdir dir="${api}"/>
+ <mkdir dir="${dist}"/>
+ <mkdir dir="${filtered}"/>
+ <mkdir dir="${test}"/> 
+ <mkdir dir="${report}"/> 
+ <mkdir dir="${lib}"/> 
+</target>
+
+<!--======================================================================-->
+<!-- VERSION -->
+<!--======================================================================-->
+<target name="version" description="Create version properties">
+  <exec executable="git" outputproperty="git.version"
+      failifexecutionfails="true" errorproperty="">
+    <arg value="describe"/>
+    <arg value="--all"/>
+    <arg value="--always"/>
+    <arg value="--long"/>
+    <arg value="--abbrev=40"/>
+    <arg value="HEAD"/>
+  </exec>
+  <tstamp>
+    <format property="build_date" pattern="yyyy-MM-dd"/>
+    <format property="build_time" pattern="HH:mm:ss"/>
+  </tstamp>
+
+  <!-- filters -->
+  <filterset id="version-filters">
+    <filter token="version_string" value="${git.version}"/>
+    <filter token="build_date"     value="${build_date}"/>
+    <filter token="build_time"     value="${build_time}"/>
+    <filter token="user_name"      value="${user.name}"/>
+  </filterset>
+  <echo level="info" message="version: ${git.version}"/>
+  <echo level="info" message="built..: ${build_date} ${build_time} by ${user_name}"/>
+</target>
+<!--======================================================================-->
+<!-- COMPILE -->
+<!--======================================================================-->
+<target name="compile" depends="clean, prepare, version"
+    description="Compile sources">
+
+    <!-- Perform filter operations -->
+        <copy todir="${filtered}" overwrite="true">
+            <fileset dir="${src}">
+                <include name="**/*.*"/>
+            </fileset>
+            <filterset refid="version-filters"/>
+        </copy>
+    <!--***************************************************************-->
+
+    <javac debug="${compile.debug}" deprecation="${compile.deprecation}" 
+        destdir="${build}/classes" srcdir="${filtered}/java" source="1.5"
+        target="1.5" includeantruntime="false">
+        <classpath refid="classpath"/>
+
+        <classpath>
+         <pathelement location="${lib}/servlet.jar"/>
+        </classpath>
+    </javac>
+
+</target>
+
+<!--======================================================================-->
+<!-- JAVADOC -->
+<!--======================================================================-->
+<target name="javadoc" depends="clean" description="Create JavaDocs">
+ <javadoc destdir="${api}" packagenames="edu.ucsd.library.${appName}.*">
+  <sourcepath>
+   <pathelement location="${src}/java"/>
+  </sourcepath>
+ </javadoc>
+</target>
+
+<!--======================================================================-->
+<!-- CLEAN -->
+<!--======================================================================-->
+<target name="clean" description="Delete build, dist, and api directory">
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+    <delete dir="${api}"/>
+    <delete dir="${filtered}"/>
+    <delete dir="${test}"/>
+    <delete dir="${report}"/>
+</target>
+
+<!--======================================================================-->
+<!-- INSTALL -->
+<!--======================================================================-->
+<target name="install" depends="webapp"
+    description="Install application to servlet container">
+
+    <!-- command to stop Tomcat???? -->
+    <!-- <exec executable="${catalina.stop}" newenvironment="true"/> -->
+
+    <!-- Remove existing instances -->
+    <delete file="${deploy.home}/${appName}.war"/>
+    <delete dir="${deploy.home}/${appName}" />
+    
+    <!-- Deploying to webapps directory -->
+    <unwar src="${dist}/${appName}.war" dest="${deploy.home}/${appName}" />
+    
+    <!-- Copy the JARS to the Tomcat shared library -->
+    <copy todir="${catalina.sharedlib}" overwrite="yes">
+     <fileset refid="jars"/>
+    </copy>
+    
+    <!-- command to start Tomcat???? -->
+    <!-- <exec executable="${catalina.start}" newenvironment="true"/> -->
+    
+</target>
+
+<!--======================================================================-->
+<!-- WEBAPP -->
+<!--======================================================================-->
+<target name="webapp_nojars" depends="compile" description="Creates a Web Archive without JARs included">
+
+    <war warfile="${dist}/${appName}.war" webxml="${filtered}/webinf/web.xml">
+        <fileset dir="${filtered}">
+            <include name="html/**/*.*"/>
+            <include name="jsp/**/*.*"/>
+        </fileset>
+        
+        <fileset dir="${filtered}/root"/>
+
+        <fileset dir="${src}/graphics"/>
+        <classes dir="${build}/classes" />
+        <webinf dir="${filtered}/webinf" excludes="web.xml" />
+        <metainf dir="${filtered}/metainf"/>
+    </war>
+</target>
+
+<!--======================================================================-->
+<!-- WEBAPP_ALL -->
+<!--======================================================================-->
+<target name="webapp" depends="compile" 
+ description="Creates a Web Archive with the JARs included">
+
+    <war warfile="${dist}/${appName}.war" webxml="${filtered}/webinf/web.xml">
+        <fileset dir="${filtered}">
+            <include name="html/**/*.*"/>
+            <include name="jsp/**/*.*"/>
+        </fileset>
+        
+        <fileset dir="${filtered}/root"/>
+
+        <fileset dir="${src}/graphics"/>
+        <classes dir="${build}/classes" />
+        <webinf dir="${filtered}/webinf" excludes="web.xml" />
+        <metainf dir="${filtered}/metainf"/>
+        <!--lib refid="jars" /-->
+        <lib dir="${lib}">
+            <exclude name="servlet.jar"/>
+            <exclude name="catalina-ant.jar"/>
+            <exclude name="tomcat-coyote.jar"/>
+            <exclude name="tomcat-juli.jar"/>
+            <exclude name="tomcat-util.jar"/>
+        </lib>
+    </war>
+</target>
+
+<!--======================================================================-->
+<!-- REPORT -->
+<!--======================================================================-->
+<target name="report" depends="clean, pmd, checkstyle" 
+ description="Run reports on the source files">
+</target>
+
+<!--======================================================================-->
+<!-- PMD -->
+<!--======================================================================-->
+<target name="pmd" depends="prepare"
+    description="Check source files for potential problems">
+
+    <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask">
+        <classpath refid="classpath"/>
+        
+        <classpath>
+         <pathelement location="${xsl.home}/pmd"/>
+        </classpath>
+        
+    </taskdef>
+
+    <pmd rulesetfiles="pmd_checks.xml" 
+        failonerror="no">
+            <formatter type="html" toFile="${report}/pmd_report.html"/>
+            <fileset dir="${src}">
+                <include name="**/*.java"/>
+            </fileset>
+    </pmd>
+    <echo message="Report stored in ${report}/pmd_report.html"/>
+</target>
+
+<!--======================================================================-->
+<!-- CHECKSTYLE -->
+<!--======================================================================-->
+<target name="checkstyle" depends="prepare" 
+    description="Check coding style for source files">
+
+    <taskdef resource="checkstyletask.properties">
+     <classpath refid="classpath"/>
+    </taskdef>
+    
+    <checkstyle config="${xsl.home}/checkstyle/checkstyle_checks.xml"
+      failureProperty="checkstyle.failure" failOnViolation="false">
+      <formatter type="xml" tofile="${report}/checkstyle_report.xml"/>
+      <fileset dir="${src}" includes="**/*.java"/>
+    </checkstyle>
+    
+    <java classname="edu.ucsd.library.util.XsltUtil" 
+    classpathref="classpath" fork="true">
+        <arg line="${xsl.home}/checkstyle/checkstyle-noframes-sorted.xsl
+            ${report}/checkstyle_report.xml
+            ${report}/checkstyle_report.html"/>
+    </java>
+
+    <echo message="Report stored in ${report}/checkstyle_report.html"/>
+
+</target>
+
+<!--======================================================================-->
+<!-- FULL_RAW -->
+<!--======================================================================-->
+
+<target name="full_raw" depends="compile"
+    description="Generate a FULL raw student data file">
+    
+    <echo message="Generating FULL student raw data file...."/>
+    <echo message="This may take a while."/>
+
+    <java 
+        classname="edu.ucsd.library.crm.apps.fullquery" 
+        classpathref="classpath" fork="true">
+    
+        <arg line="${src}/webinf ${full_raw_file}"/>
+    </java>
+    
+    <echo message="...done! Result is stored in ${full_raw_file}..."/>
+    
+</target>
+
+<!--======================================================================-->
+<!-- FULL_MERGE -->
+<!--======================================================================-->
+
+<target name="full_merge" depends="full_raw"
+    description="Generate a FULL merge student data file">
+    
+    <echo message="Merging data within raw FULL data file...."/>
+
+    <java 
+        classname="edu.ucsd.library.crm.apps.mergeaddr" 
+        classpathref="classpath" fork="true">
+    
+        <arg line="${full_raw_file} ${full_merge_file}"/>
+    </java>
+
+    <echo message="...done! Result is stored in ${full_merge_file}..."/>
+    
+</target>
+
+<!--======================================================================-->
+<!-- FULL_MARC -->
+<!--======================================================================-->
+
+<target name="full_marc" depends="full_merge"
+    description="Generate a FULL marc student data file">
+    
+    <echo message="Creating marc file from FULL merged data..."/>
+
+    <java 
+        classname="edu.ucsd.library.crm.apps.makemarc" 
+        classpathref="classpath" fork="true">
+    
+        <arg line="${src}/webinf ${full_merge_file} ${full_marc_file}"/>
+    </java>
+
+    <echo message="...done! Result is stored in ${full_marc_file}..."/>
+    
+</target>
+
+<!--======================================================================-->
+<!-- INC_RAW -->
+<!--======================================================================-->
+
+<target name="inc_raw" depends="compile"
+    description="Generate an INCREMENTAL raw student data file">
+    
+    <echo message="Generating INCREMENTAL student raw data file...."/>
+    <echo message="This may take a while."/>
+
+    <java 
+        classname="edu.ucsd.library.crm.apps.incquery" 
+        classpathref="classpath" fork="true">
+    
+        <arg line="${src}/webinf ${inc_raw_file}"/>
+    </java>
+    
+    <echo message="...done! Result is stored in ${inc_raw_file}..."/>
+    
+</target>
+
+<!--======================================================================-->
+<!-- INC_MERGE -->
+<!--======================================================================-->
+
+<target name="inc_merge" depends="inc_raw"
+    description="Generate an INCREMENTAL merge student data file">
+    
+    <echo message="Merging data within raw INCREMENTAL data file...."/>
+
+    <java 
+        classname="edu.ucsd.library.crm.apps.mergeaddr" 
+        classpathref="classpath" fork="true">
+    
+        <arg line="${inc_raw_file} ${inc_merge_file}"/>
+    </java>
+
+    <echo message="...done! Result is stored in ${inc_merge_file}..."/>
+    
+</target>
+
+<!--======================================================================-->
+<!-- INC_MARC -->
+<!--======================================================================-->
+
+<target name="inc_marc" depends="inc_merge"
+    description="Generate an INCREMENTAL marc student data file">
+    
+    <echo message="Creating marc file from INCREMENTAL merged data..."/>
+
+    <java 
+        classname="edu.ucsd.library.crm.apps.makemarc" 
+        classpathref="classpath" fork="true">
+    
+        <arg line="${src}/webinf ${inc_merge_file} ${inc_marc_file}"/>
+    </java>
+
+    <echo message="...done! Result is stored in ${inc_marc_file}..."/>
+    
+</target>
+
+
+
+<!--======================================================================-->
+<!-- EMP_FULL_RAW -->
+<!--======================================================================-->
+
+<target name="emp_full_raw" depends="compile"
+    description="Generate a FULL raw employee data file">
+    
+    <echo message="Generating FULL employee raw data file...."/>
+    <echo message="This may take a while."/>
+
+    <java 
+        classname="edu.ucsd.library.crm.apps.fullquery_employee" 
+        classpathref="classpath" fork="true">
+    
+        <arg line="${src}/webinf/emp_affiliations.properties ${src}/webinf/employee_types.properties ${src}/webinf/patron_load.properties ${emp_full_raw_file} true"/>
+    </java>
+    
+    <echo message="...done! Result is stored in ${emp_full_raw_file}..."/>
+    
+</target>
+
+<!--======================================================================-->
+<!-- EMP_ACTIVE_RAW -->
+<!--======================================================================-->
+
+<target name="emp_active_raw" depends="compile"
+    description="Generate an ACTIVE raw employee data file">
+    
+    <echo message="Generating an ACTIVE employee raw data file...."/>
+    <echo message="This may take a while."/>
+
+    <java 
+        classname="edu.ucsd.library.crm.apps.fullquery_employee" 
+        classpathref="classpath" fork="true">
+    
+        <arg line="${src}/webinf/emp_affiliations.properties ${src}/webinf/employee_types.properties ${src}/webinf/patron_load.properties ${emp_active_raw_file} false"/>
+    </java>
+    
+    <echo message="...done! Result is stored in ${emp_active_raw_file}..."/>
+    
+</target>
+
+
+<!--======================================================================-->
+<!-- EMP_INC_RAW -->
+<!--======================================================================-->
+
+<target name="emp_inc_raw" depends=""
+    description="Generate an INCREMENTAL raw employee data file">
+    
+    <echo message="Creating an INCREMENTAL raw employee data file...."/>
+
+    <java 
+        classname="edu.ucsd.library.crm.apps.incquery_employee" 
+        classpathref="classpath" fork="true">
+    
+        <arg line="${emp_full_raw_old} ${emp_full_raw_file} ${emp_inc_raw_file}"/>
+    </java>
+
+    <echo message="...done! Result is stored in ${emp_inc_raw_file}..."/>
+    
+</target>
+
+<!--======================================================================-->
+<!-- GET_HASH -->
+<!--======================================================================-->
+<target name="get_hash" depends="compile"
+    description="Gets the hashed version of a password">
+
+    <input addproperty="password"
+    message="Enter your password: "/>
+    
+    <java 
+        classname="edu.ucsd.library.crm.beans.crm_bean" 
+        classpathref="classpath" fork="true">
+    
+        <arg line="${password}"/>
+    </java>
+
+    <echo message="...done! Your password hash (SHA-1) is right above!"/>
+    
+</target>
+
+  <!-- remote deployment -->
+  <taskdef name="undeploy" classname="org.apache.catalina.ant.UndeployTask"
+      classpathref="classpath"/>
+  <taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask"
+      classpathref="classpath"/>
+  <target name="remote-redeploy"
+      description="Undeploy and then redeploy webapp to remote tomcat">
+    <antcall target="remote-undeploy"/>
+    <waitfor maxwait="1000" maxwaitunit="millisecond">
+      <equals arg1="1" arg2="2"/>
+    </waitfor>
+    <antcall target="remote-deploy"/>
+  </target>
+  <target name="remote-deploy" description="Deploy webapp to remote tomcat">
+    <echo level="info" message="war = 'file://${dist}/${appName}.war'"/>
+    <deploy url="http://${manager.host}:8080/manager/text" path="/${appName}"
+        username="${manager.user}" password="${manager.pass}"
+        war="file://${dist}/${appName}.war"/>
+  </target>
+  <target name="remote-undeploy" description="Remove webapp from remote tomcat">
+    <undeploy url="http://${manager.host}:8080/manager/text" path="/${appName}"
+          username="${manager.user}" password="${manager.pass}" failonerror="false"/>
+  </target>
+</project>
