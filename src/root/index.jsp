@@ -23,19 +23,9 @@
 	String pathToProperties = crm.getPathToProperties();
 	
 	crm.setMarcFilesDir(marcFilePath);
-	crm.setPathToACLFile(webinfDir + "acl" + File.separator + "users.acl");
 	
 	String contextURL = javax.servlet.http.HttpUtils.getRequestURL(request).toString();
 	contextURL = contextURL.substring(0, contextURL.lastIndexOf('/')) + "/";
-%>
 
-
-
-<%
-	String userName = "user";
-			
-	session.setAttribute("username", userName);
-		
-	crm.setCurrentUser(userName);
 	response.sendRedirect("jsp/validuser.jsp");		
 %>

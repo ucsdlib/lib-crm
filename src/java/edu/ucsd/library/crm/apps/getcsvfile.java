@@ -39,7 +39,6 @@ public class getcsvfile extends HttpServlet {
 		String fileToGet = req.getParameter("file");
 
 		if (fileToGet != null) {
-			//if (mySession.getAttribute("username") != null) {
 
 				String pathToFile = marcFilesDir + fileToGet;
 				

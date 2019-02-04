@@ -10,7 +10,6 @@
    version="2.5"> 
   <context-param>
     <param-name>marcFilePath</param-name>
-    <!-- param-value>/Users/tchu/pub/data2/crm/</param-value-->
     <param-value>/pub/data1/import/htdocs/crm/</param-value>
     <description>Path where marc files are written</description>
   </context-param>
@@ -67,7 +66,7 @@
     </web-resource-collection>
     <auth-constraint>
       <description>Users in the crm Group</description>
-      <role-name>patronload</role-name>
+      <role-name>PatronLoad</role-name>
     </auth-constraint>
     <user-data-constraint>
       <transport-guarantee>NONE</transport-guarantee>
@@ -84,7 +83,7 @@
   </login-config>
   <!-- AD ROLES -->
   <security-role>
-    <role-name>patronload</role-name>
+    <role-name>PatronLoad</role-name>
   </security-role>
     
 </web-app>
