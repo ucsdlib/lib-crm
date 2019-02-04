@@ -66,7 +66,7 @@
     </web-resource-collection>
     <auth-constraint>
       <description>Users in the crm Group</description>
-      <role-name>PatronLoad</role-name>
+      <role-name>libCMS</role-name>
     </auth-constraint>
     <user-data-constraint>
       <transport-guarantee>NONE</transport-guarantee>
@@ -83,7 +83,7 @@
   </login-config>
   <!-- AD ROLES -->
   <security-role>
-    <role-name>PatronLoad</role-name>
+    <role-name>libCMS</role-name>
   </security-role>
     
 </web-app>
