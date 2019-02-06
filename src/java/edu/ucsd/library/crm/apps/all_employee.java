@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.naming.NamingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,6 +26,7 @@ import java.util.Properties;
 import java.util.Vector;
 
 import edu.ucsd.library.util.FileUtils;
+import edu.ucsd.library.util.sql.ConnectionManager;
 
 /**
  *
@@ -129,13 +131,23 @@ public class all_employee {
 			return;
 		}
 
-		
+		/*
 		String db2Driver = (String) original.get("db2driver");
 		String db2Username = (String) original.get("db2username");
 		String db2Password = (String) original.get("db2password");
 		String db2Connection = (String) original.get("db2connection");
 		
-		
+		InitialContext ctx = null;
+        DataSource ds = null;
+        try {
+            ctx = new InitialContext();
+            ds = (DataSource)ctx.lookup("java:comp/env/jdbc/actDB2");
+        } catch (NamingException e) {            
+            System.out.println("$$$ Naming Exception",e);
+            return;           
+        } */
+        String db2Driver = "com.ibm.db2.jcc.DB2Driver";
+
 		try {
 			Class.forName(db2Driver).newInstance();
 		} catch (Exception E) {
@@ -152,10 +164,13 @@ public class all_employee {
 		String currentDate = format.format(new java.util.Date());
 	    try {
 
+	      /*
 			db2Conn = DriverManager.getConnection(
 					db2Connection,
 					db2Username,
 					db2Password);
+*/
+	        db2Conn = ConnectionManager.getConnection("jdbc/actDB2");
 
 			//stmt = db2Conn.createStatement();
 
@@ -219,7 +234,9 @@ public class all_employee {
 		} catch (SQLException ex) {
 			System.err.println("Exception: " + ex);
 	
-		} finally {
+		} catch (NamingException e) {
+		    System.err.println("JNDI Lookup failed for DB2 connection: " + e);
+        } finally {
 			try {
 				if (rs != null)
 					rs.close();				
