@@ -60,10 +60,7 @@ public class create_employee_file {
 			System.out.println(
 				"\nSyntax: java create_employee_file [destination directory] [properties dir]");
 		} else {
-			
-			String prop_affiliations = args[1] + File.separator + "emp_affiliations.properties";
 			String prop_employee_type = args[1] + File.separator + "employee_types.properties";
-			String prop_original = args[1] + File.separator + "patron_load.properties";
 			try {
 				File tmp = new File(args[0] + "all_active_employee.txt");
 				DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -73,44 +70,40 @@ public class create_employee_file {
 		        
 		        Calendar c =  Calendar.getInstance();
 		        String todayDatePart = formatter.format(c.getTime());
-				/*if(modifiedDatePart != null && todayDatePart.equals(modifiedDatePart)) {
-					System.out.println("Difference file already exists");
-				} else {*/
-					//if there is already an old file that was renamed, delete it
-					tmp = new File(args[0] + "all_active_employee_old.txt");
-					if (tmp.exists())
-						tmp.delete();
+
+				tmp = new File(args[0] + "all_active_employee_old.txt");
+				if (tmp.exists())
+					tmp.delete();
 					
-					//now rename the 'new' old file (if it exists, which it should)
-					tmp = new File(args[0] + "all_active_employee.txt");
-					if (tmp.exists()) {
-						tmp.renameTo(new File(args[0] + "all_active_employee_old.txt"));
-					}
-					all_employee.grabData(prop_affiliations, prop_employee_type, prop_original, args[0] + File.separator + "all_active_employee.txt");
-					makecsv_employee.makeCsv(
+				//now rename the 'new' old file (if it exists, which it should)
+				tmp = new File(args[0] + "all_active_employee.txt");
+				if (tmp.exists()) {
+					tmp.renameTo(new File(args[0] + "all_active_employee_old.txt"));
+				}
+                all_employee.grabData(prop_employee_type, args[0] + File.separator + "all_active_employee.txt");
+				makecsv_employee.makeCsv(
 							args[1],
 							args[0] + File.separator + "all_active_employee.txt",
 							args[0] + File.separator + createFullCsvFileName());
-					if ((new File(args[0] + "all_active_employee_old.txt")).exists()) {
+				if ((new File(args[0] + "all_active_employee_old.txt")).exists()) {
 						
-						String[] tmp_args = new String[3];
-						tmp_args[0] = args[0] + "all_active_employee_old.txt";
-						tmp_args[1] = args[0] + "all_active_employee.txt";
-						tmp_args[2] = args[0] + "inc_all_employee.txt";
-						inc_all_employee.main(tmp_args);
+					String[] tmp_args = new String[3];
+					tmp_args[0] = args[0] + "all_active_employee_old.txt";
+					tmp_args[1] = args[0] + "all_active_employee.txt";
+					tmp_args[2] = args[0] + "inc_all_employee.txt";
+					inc_all_employee.main(tmp_args);
 						
-						System.out.println("---Difference all employee file has been created!");
+					System.out.println("---Difference all employee file has been created!");
 								
-						makecsv_employee.makeCsv(
+					makecsv_employee.makeCsv(
 							args[1],
 							args[0] + File.separator + "inc_all_employee.txt",
 							args[0] + File.separator + createCsvFileName());
-						System.out.println("csv file for inc_all_employee.txt has been created");
+					System.out.println("csv file for inc_all_employee.txt has been created");
 							
-					} else {
-					    System.out.println("ERROR: '" + args[0] + "all_active_employee_old.txt' doex not exist!");
-					}
-				//}
+				} else {
+					System.out.println("ERROR: '" + args[0] + "all_active_employee_old.txt' doex not exist!");
+				}
 			} catch (Exception e) {
 			}					
 		}

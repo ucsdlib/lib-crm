@@ -26,26 +26,7 @@ Choose the Preporties File :
 </td>
 
 </tr>
-<tr>
 
-<td>
-<form action="listProperties.jsp" method="get">
-<input type="hidden" name="target" value="emp_affiliations.properties"/>
-<input type="submit" value="Employee Affiliations File"/>
-</form>
-</td>
-
-</tr>
-<tr>
-
-<td>
-<form action="listProperties.jsp" method="get">
-<input type="hidden" name="target" value="patron_load.properties"/>
-<input type="submit" value="Patron Load File"/>
-</form>
-</td>
-
-</tr>
 </table>
 
 

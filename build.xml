@@ -385,51 +385,6 @@
     
 </target>
 
-
-
-<!--======================================================================-->
-<!-- EMP_FULL_RAW -->
-<!--======================================================================-->
-
-<target name="emp_full_raw" depends="compile"
-    description="Generate a FULL raw employee data file">
-    
-    <echo message="Generating FULL employee raw data file...."/>
-    <echo message="This may take a while."/>
-
-    <java 
-        classname="edu.ucsd.library.crm.apps.fullquery_employee" 
-        classpathref="classpath" fork="true">
-    
-        <arg line="${src}/webinf/emp_affiliations.properties ${src}/webinf/employee_types.properties ${src}/webinf/patron_load.properties ${emp_full_raw_file} true"/>
-    </java>
-    
-    <echo message="...done! Result is stored in ${emp_full_raw_file}..."/>
-    
-</target>
-
-<!--======================================================================-->
-<!-- EMP_ACTIVE_RAW -->
-<!--======================================================================-->
-
-<target name="emp_active_raw" depends="compile"
-    description="Generate an ACTIVE raw employee data file">
-    
-    <echo message="Generating an ACTIVE employee raw data file...."/>
-    <echo message="This may take a while."/>
-
-    <java 
-        classname="edu.ucsd.library.crm.apps.fullquery_employee" 
-        classpathref="classpath" fork="true">
-    
-        <arg line="${src}/webinf/emp_affiliations.properties ${src}/webinf/employee_types.properties ${src}/webinf/patron_load.properties ${emp_active_raw_file} false"/>
-    </java>
-    
-    <echo message="...done! Result is stored in ${emp_active_raw_file}..."/>
-    
-</target>
-
-
 <!--======================================================================-->
 <!-- EMP_INC_RAW -->
 <!--======================================================================-->

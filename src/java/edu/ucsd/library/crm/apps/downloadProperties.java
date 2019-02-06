@@ -36,60 +36,37 @@ public void doGet(HttpServletRequest request, HttpServletResponse response) thro
 	 is.readLine();
 	 is.readLine();
 	 is.readLine();
-	 if(fileName.equals("emp_affiliations.properties"))
-		 is.readLine();
+	 
 	 String lineIn;
 	 ServletOutputStream os = response.getOutputStream();  	 
 	 Map<String,String> sortedMap = null;	 
-     if(fileName.equals("patron_load.properties"))
-     {
-    	 	Map<String, String> propPatronMap = new HashMap<String, String>();
-    	 	Properties props = null;
-        try {
-            	props = FileUtils.loadProperties(marcFilesDir + fileName);
-        } catch (IOException ioe) {
-        		System.err.println("IOException:"+ioe);
-        } 
-    	 	Enumeration e = props.propertyNames();
-	    for (; e.hasMoreElements(); ) {
-	        String propName = (String)e.nextElement();
-	        String propValue = (String)props.get(propName);
-	        if(propValue.length() < 5 && !propName.contains("quartercode"))
-	        		propPatronMap.put(propName, propValue);
-	    }    
-	    sortedMap = new TreeMap(propPatronMap);
-     } else {
-    	 	Map<Integer, String> propMap = new HashMap<Integer, String>();
-		while((lineIn = is.readLine()) != null)
-		{
-			String[] temp = lineIn.split("=");
-			if(temp.length == 2)
-				propMap.put(Integer.parseInt(temp[0]),temp[1]);
-			else
-				propMap.put(Integer.parseInt(temp[0]), "");
-		 }
-		 sortedMap = new TreeMap(propMap);
-		 if(fileName.equals("emp_affiliations.properties"))
-			 os.write("##Employee Download - Affiliation code\n#[department code] = [library code]\n".getBytes());
-		 else
-			 os.write("##Staff Group\n".getBytes());
-     }
-		 
-	 Iterator it = sortedMap.entrySet().iterator();
-	 while(it.hasNext())
-	 {
-		 Map.Entry pairs = (Map.Entry)it.next();
-		 if(pairs.getKey().toString().length() > 0) {
-			String temp2 = pairs.getKey().toString() + "=" + pairs.getValue() + "\n";
-		 	os.write(temp2.getBytes());
-		 }
-	 }
-	 
-	 os.flush();  
-	 os.close(); 
-	}  
-	
 
+    	 Map<Integer, String> propMap = new HashMap<Integer, String>();
+	 while((lineIn = is.readLine()) != null)
+	 {
+         String[] temp = lineIn.split("=");
+		 if(temp.length == 2)
+			 propMap.put(Integer.parseInt(temp[0]),temp[1]);
+		 else
+			 propMap.put(Integer.parseInt(temp[0]), "");
+	  }
+	  sortedMap = new TreeMap(propMap);
+
+	  os.write("##Staff Group\n".getBytes());
+		 
+	  Iterator it = sortedMap.entrySet().iterator();
+	  while(it.hasNext())
+	  {
+		  Map.Entry pairs = (Map.Entry)it.next();
+		  if(pairs.getKey().toString().length() > 0) {
+			  String temp2 = pairs.getKey().toString() + "=" + pairs.getValue() + "\n";
+		 	  os.write(temp2.getBytes());
+		   }
+	  }
+	 
+	  os.flush();  
+	  os.close(); 
+	}
 }  
 
 

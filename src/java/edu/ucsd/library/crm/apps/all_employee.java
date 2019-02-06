@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.naming.NamingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,6 +26,7 @@ import java.util.Properties;
 import java.util.Vector;
 
 import edu.ucsd.library.util.FileUtils;
+import edu.ucsd.library.util.sql.ConnectionManager;
 
 /**
  *
@@ -37,16 +39,15 @@ public class all_employee {
 	 * @param args the command line arguments
 	 * args[0] = path to affiliations properties file
 	 * args[1] = path to patron type codes properties file
-	 * args[2] = path to original properties file
-	 * args[3] = file to write output to
+	 * args[2] = file to write output to
 	 */
 	public static void main(String args[]) {
 
 		if ((args == null) || (args.length < 5)) {
 			System.out.println(
-				"\nSyntax: java all_employee [affiliations properties file] [patron type codes properties file] [original properties file] [fileToWrite]");
+				"\nSyntax: java all_employee [patron type codes properties file] [fileToWrite]");
 		} else {
-			grabData(args[0], args[1], args[2], args[3]);
+			grabData(args[0], args[1]);
 		}
 	}
 	
@@ -63,14 +64,9 @@ public class all_employee {
 	 * Write data out to the file
 	 * @param props1 Path to affilications properties file
 	 * @param props2 Path to type codes properties file
-	 * @param props3 Path to original properties file
 	 * @param fileToWrite Path to the file to write results to
 	 */
-	public static void grabData(
-		String props1,
-		String props2,
-		String props3,
-		String fileToWrite) {
+	public static void grabData(String props1, String fileToWrite) {
 
 		outputLocation = fileToWrite.substring(0, fileToWrite.lastIndexOf(File.separator) + 1);
 		
@@ -84,7 +80,7 @@ public class all_employee {
 					new BufferedOutputStream(
 						new FileOutputStream(fileToWrite)));
 
-			getRawData(props1, props2, props3, pw);
+			getRawData(props1, pw);
 
 			if (pw != null)
 				pw.close();
@@ -99,29 +95,15 @@ public class all_employee {
 
 	/**
 	 * Method to retreive data from database and output to raw file.
-	 * @param props1 Path to affiliation properties file
-	 * @param props2 Path to type codes properties file
-	 * @param props3 Path to original properties file
+	 * @param props1 Path to type codes properties file
 	 * @param fileToWrite Path to the file to write results to
 	 */
-	public static void getRawData(
-		String props1,
-		String props2,
-		String props3,
-		PrintWriter pw) {
+	public static void getRawData(String props1, PrintWriter pw) {
 
-		if (!props3.equals("")) {
-			props3 += File.separator;
-		}
-
-		// load the properties file to get the current quarter code
 		Properties typeCodes = null;
-		Properties original = null;
 		Properties affiliationCodes = null;
 		try {
-			original = FileUtils.loadProperties(props3);
-			typeCodes = FileUtils.loadProperties(props2);
-			affiliationCodes = FileUtils.loadProperties(props1);
+			typeCodes = FileUtils.loadProperties(props1);
 			getAllTypeCodes(typeCodes);
 			
 		} catch (IOException ioe) {
@@ -129,13 +111,8 @@ public class all_employee {
 			return;
 		}
 
-		
-		String db2Driver = (String) original.get("db2driver");
-		String db2Username = (String) original.get("db2username");
-		String db2Password = (String) original.get("db2password");
-		String db2Connection = (String) original.get("db2connection");
-		
-		
+        String db2Driver = "com.ibm.db2.jcc.DB2Driver";
+
 		try {
 			Class.forName(db2Driver).newInstance();
 		} catch (Exception E) {
@@ -144,20 +121,13 @@ public class all_employee {
 			System.exit(1);
 		}
 		
-		//Statement stmt = null;
 		PreparedStatement stmt = null;
 		Connection db2Conn = null;
 		ResultSet rs = null;
 		SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
 		String currentDate = format.format(new java.util.Date());
 	    try {
-
-			db2Conn = DriverManager.getConnection(
-					db2Connection,
-					db2Username,
-					db2Password);
-
-			//stmt = db2Conn.createStatement();
+	        db2Conn = ConnectionManager.getConnection("jdbc/actDB2");
 
 			String query =
 				"SELECT DISTINCT "
@@ -219,7 +189,9 @@ public class all_employee {
 		} catch (SQLException ex) {
 			System.err.println("Exception: " + ex);
 	
-		} finally {
+		} catch (NamingException e) {
+		    System.err.println("JNDI Lookup failed for DB2 connection: " + e);
+        } finally {
 			try {
 				if (rs != null)
 					rs.close();				

@@ -218,9 +218,7 @@ public class crm_bean {
 	        o = myProp.setProperty(name, newValue);
 	        String cmt;
 	        
-	        if(file.equals("emp_affiliations.properties"))
-	        	cmt = "#Employee Download - Affiliation code\n#[department code] = [library code]\n";
-	       	else if(file.equals("employee_types.properties"))
+	        if(file.equals("employee_types.properties"))
 	       		cmt ="#Staff Group\n";
 	       	else 
 	       		cmt = "#\n#Wed Apr 09 15:47:59 PDT 2008\n";
@@ -254,9 +252,7 @@ public class crm_bean {
 	        o = myProp.remove(name);
 	        String cmt;
 	        
-	        if(file.equals("emp_affiliations.properties"))
-	        	cmt = "#Employee Download - Affiliation code\n#[department code] = [library code]\n";
-	       	else if(file.equals("employee_types.properties"))
+	        if(file.equals("employee_types.properties"))
 	       		cmt ="#Staff Group\n";
 	       	else 
 	       		cmt = "#\n#Wed Apr 09 15:47:59 PDT 2008\n";
@@ -293,31 +289,16 @@ public class crm_bean {
         	
         } 
         Map<String,String> sortedMap = null;
-        if(file.equals("patron_load.properties"))
-        {
-	        Map<String, String> propMap = new HashMap<String, String>();
-	        Enumeration e = props.propertyNames();
-	        for (; e.hasMoreElements(); ) {
-	            String propName = (String)e.nextElement();
-	            String propValue = (String)props.get(propName);
-	            if(propValue.length() < 5 && !propName.contains("quartercode"))
-	            		propMap.put(propName, propValue);
-	        }    
-	        sortedMap = new TreeMap(propMap);
-        }
-        else
-        {
         	Map<Integer, String> propMap = new HashMap<Integer, String>();
-  	        Enumeration e = props.propertyNames();
-  	        for (; e.hasMoreElements(); ) {
-  	            String propName = (String)e.nextElement();
-  	            int propKey = Integer.parseInt(propName);
-  	            String propValue = (String)props.get(propName);
-  	            if(propValue.length() < 5)
-  	            	propMap.put(propKey, propValue);
-  	        }    
-  	        sortedMap = new TreeMap(propMap);
-        }
+  	    Enumeration e = props.propertyNames();
+  	    for (; e.hasMoreElements(); ) {
+  	        String propName = (String)e.nextElement();
+  	        int propKey = Integer.parseInt(propName);
+  	        String propValue = (String)props.get(propName);
+  	        if(propValue.length() < 5)
+  	        propMap.put(propKey, propValue);
+  	    }    
+  	    sortedMap = new TreeMap(propMap);
        return sortedMap;
 	}
 	

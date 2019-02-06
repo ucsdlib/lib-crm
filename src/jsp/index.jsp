@@ -18,7 +18,7 @@
 	
 	String marcFilePath = application.getInitParameter("marcFilePath");
 		
-	crm.setPathToProperties(marcFilePath + "patron_load.properties");
+	crm.setPathToProperties(marcFilePath + "employee_types.properties");
 	
 	String pathToProperties = crm.getPathToProperties();
 	
