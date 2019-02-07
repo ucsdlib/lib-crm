@@ -37,9 +37,8 @@ public class all_employee {
 
 	/**
 	 * @param args the command line arguments
-	 * args[0] = path to affiliations properties file
-	 * args[1] = path to patron type codes properties file
-	 * args[2] = file to write output to
+	 * args[0] = path to patron type codes properties file
+	 * args[1] = file to write output to
 	 */
 	public static void main(String args[]) {
 
@@ -63,7 +62,6 @@ public class all_employee {
 	/**
 	 * Write data out to the file
 	 * @param props1 Path to affilications properties file
-	 * @param props2 Path to type codes properties file
 	 * @param fileToWrite Path to the file to write results to
 	 */
 	public static void grabData(String props1, String fileToWrite) {
