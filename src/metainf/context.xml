@@ -4,4 +4,5 @@
         userSuffix=",OU=Users,OU=University Library,DC=AD,DC=UCSD,DC=EDU"
         roleAttrib="memberOf"/>
   <ResourceLink name="clusterSharedPath" global="clusterSharedPath" type="java.lang.String"/>
+  <ResourceLink name="jdbc/actDB2" global="jdbc/actDB2"  type="javax.sql.DataSource"/>
 </Context>
