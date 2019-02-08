@@ -58,8 +58,8 @@ public class makecsv_employee {
 				}
 			}    
 			 for (Iterator i = tmpMap.keySet().iterator(); i.hasNext();) {
-			        key = (String) i.next();
-			        value = tmpMap.get(key).toString();
+                 key = (String) i.next();
+                 value = tmpMap.get(key).toString();
 			        if (value != null) {
 			        	  strArray = value.split(" # ");
 			        	  tmpMailCode = new Vector();
@@ -102,12 +102,13 @@ public class makecsv_employee {
 			  			
 			        }
 			    }
-							
 			pw.close();
-
 		} catch (IOException ioe) {
 			System.out.println(ioe);
-		} finally {
+		} catch (Exception e) {
+            System.out.println(e);
+            e.printStackTrace();
+        } finally {
 			try {
 				pw.close();
 			} catch (Exception e) {

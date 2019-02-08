@@ -59,7 +59,7 @@ function logout() {
 <td bgcolor='#6092C3' ONCLICK="parent.frames['workarea'].location='create_all_employee.jsp.jsp'" onMouseOver="this.style.backgroundColor='#6161C2'; this.style.color='white'; this.style.cursor='hand';" onMouseOut="this.style.backgroundColor='#6092C3'; this.style.color='black'">
 <font face="Verdana, Arial, sans-serif" size=2 class="fontNormal">
 <img src="../images/downarrow.gif">
-<b><a href="create_all_employee.jsp" target="workarea">Transform CSV</a></b>
+<b><a href="transform.jsp" target="workarea">Transform CSV</a></b>
 </font>
 </td>
 </tr>

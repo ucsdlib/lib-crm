@@ -4,13 +4,8 @@ package edu.ucsd.library.crm.apps;
  * 
  * dofull_employee.java
  *
- * Created on October 22, 2003, 2:02 PM
  */
 
-/**
- *
- * @author  Joseph Jesena
- */
 
 import java.io.File;
 import java.text.Format;
@@ -34,7 +29,7 @@ public class create_employee_file {
 		Format formatter;
 		formatter = new SimpleDateFormat("yyyy-MMM-dd");
 		String dateString = formatter.format(new java.util.Date());
-		return ("inc-employees-" + dateString + ".csv");
+		return ("inc-raw-employees-" + dateString + ".csv");
 	}
 
 	/**
@@ -46,7 +41,7 @@ public class create_employee_file {
 		Format formatter;
 		formatter = new SimpleDateFormat("yyyy-MMM-dd");
 		String dateString = formatter.format(new java.util.Date());
-		return ("full-employees-" + dateString + ".csv");
+		return ("full-raw-employees-" + dateString + ".csv");
 	}
 	
 	/**

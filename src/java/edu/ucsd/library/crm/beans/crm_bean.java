@@ -29,10 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 import edu.ucsd.library.util.FileUtils;
 import edu.ucsd.library.util.TextUtils;
 
-/**
- *
- * @author  Joseph Jesena
- */
 public class crm_bean {
     
     /** Creates new crm_bean */
@@ -190,7 +186,7 @@ public class crm_bean {
     }
 
 	/**
-	 * Method to do an incremental database query for employees
+	 * Method to create a full and incremental employees files
 	 */
 	public void doAllEmployee() {
 		String[] tmp = new String[2];
@@ -200,7 +196,19 @@ public class crm_bean {
 		tmp[1] = marcFilesDir;
 		edu.ucsd.library.crm.apps.create_employee_file.main(tmp);
 	}
-	
+
+    /**
+     * Method to create transform csv file
+     */
+    public void transformEmployee() {
+        String[] tmp = new String[2];
+        
+        String propsDir = pathToProperties.substring(0, pathToProperties.lastIndexOf(File.separator)+1);
+        tmp[0] = marcFilesDir;
+        tmp[1] = marcFilesDir;
+        edu.ucsd.library.crm.apps.transform_employee_file.main(tmp);
+    }
+    
 	/**
 	 * Method to change the properties file
 	 */
