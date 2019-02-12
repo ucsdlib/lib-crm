@@ -42,7 +42,7 @@ public class all_employee {
 	 */
 	public static void main(String args[]) {
 
-		if ((args == null) || (args.length < 5)) {
+		if ((args == null) || (args.length < 3)) {
 			System.out.println(
 				"\nSyntax: java all_employee [patron type codes properties file] [fileToWrite]");
 		} else {
@@ -160,7 +160,7 @@ public class all_employee {
 
 						")) " 
 					
-					+ ") ORDER BY EMPID, p.emp_last_name";
+					+ ") ORDER BY p.emp_last_name";
 			
             //System.out.println ("all employee query:"+query+"$$$$$");	
 			stmt = db2Conn.prepareStatement(query);
