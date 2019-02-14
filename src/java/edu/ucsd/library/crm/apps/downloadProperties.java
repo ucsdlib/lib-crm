@@ -41,18 +41,16 @@ public void doGet(HttpServletRequest request, HttpServletResponse response) thro
 	 ServletOutputStream os = response.getOutputStream();  	 
 	 Map<String,String> sortedMap = null;	 
 
-    	 Map<Integer, String> propMap = new HashMap<Integer, String>();
+    	 Map<String, String> propMap = new HashMap<String, String>();
 	 while((lineIn = is.readLine()) != null)
 	 {
          String[] temp = lineIn.split("=");
 		 if(temp.length == 2)
-			 propMap.put(Integer.parseInt(temp[0]),temp[1]);
+			 propMap.put(temp[0],temp[1]);
 		 else
-			 propMap.put(Integer.parseInt(temp[0]), "");
+			 propMap.put(temp[0], "");
 	  }
 	  sortedMap = new TreeMap(propMap);
-
-	  os.write("##Staff Group\n".getBytes());
 		 
 	  Iterator it = sortedMap.entrySet().iterator();
 	  while(it.hasNext())

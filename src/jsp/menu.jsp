@@ -89,22 +89,7 @@ function logout() {
 <td bgcolor='#6092C3' ONCLICK="parent.frames['workarea'].location='changeProperties.jsp.jsp'" onMouseOver="this.style.backgroundColor='#6161C2'; this.style.color='white'; this.style.cursor='hand';" onMouseOut="this.style.backgroundColor='#6092C3'; this.style.color='black'">
 <font face="Verdana, Arial, sans-serif" size=2 class="fontNormal">
 <img src="../images/downarrow.gif">
-<b><a href="changeProperties.jsp" target="workarea">Change Department</a></b>
-</font>
-</td>
-</tr>
-
-<tr>
-<td>
-&nbsp;
-</td>
-</tr>
-
-<tr>
-<td bgcolor='#6092C3' ONCLICK="parent.frames['workarea'].location='changeProperties.jsp.jsp'" onMouseOver="this.style.backgroundColor='#6161C2'; this.style.color='white'; this.style.cursor='hand';" onMouseOut="this.style.backgroundColor='#6092C3'; this.style.color='black'">
-<font face="Verdana, Arial, sans-serif" size=2 class="fontNormal">
-<img src="../images/downarrow.gif">
-<b><a href="changeProperties.jsp" target="workarea">Change Title</a></b>
+<b><a href="changeProperties.jsp" target="workarea">Change Mappings</a></b>
 </font>
 </td>
 </tr>

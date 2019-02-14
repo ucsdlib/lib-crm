@@ -12,7 +12,7 @@
 <tr>
 <td>
 <font face="Verdana, Arial, sans-serif" size=2 class="fontNormal" color="#FFFFFF">
-Choose the Preporties File :
+Choose the File :
 </font>
 </td>
 </tr>
@@ -20,8 +20,19 @@ Choose the Preporties File :
 
 <td>
 <form action="listProperties.jsp" method="get">
-<input type="hidden" name="target" value="employee_types.properties"/>
-<input type="submit" value="Employee Type File"/>
+<input type="hidden" name="target" value="org_name_mapping.properties"/>
+<input type="submit" value="Organization Name File"/>
+</form>
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+<form action="listProperties.jsp" method="get">
+<input type="hidden" name="target" value="appointment_mapping.properties"/>
+<input type="submit" value="Appointment Title File"/>
 </form>
 </td>
 

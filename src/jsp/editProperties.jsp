@@ -12,7 +12,7 @@
 	{
 		request.setAttribute("action","edit");
 		crm.delProperties(target, key); 
-		request.setAttribute("message", "Key is deleted!");
+		request.setAttribute("message", "\"" + key + "\" is deleted!");
 	}
 	else if( request.getParameter("action").equals("add"))
 	{
@@ -26,16 +26,16 @@
 		else
 		{
 			request.setAttribute("action","edit");
-			crm.setPropertiesFile(target, key, value); 
-			request.setAttribute("message", "Key is added.");
+			crm.setPropertiesFile(target, key, value, true); 
+			request.setAttribute("message", "\"" + key + "\" is added.");
 		}
 			
 	}
 	else
 	{
 		request.setAttribute("action","edit");
-		crm.setPropertiesFile(target, key, value); 
-		request.setAttribute("message", "Key is added.");
+		crm.setPropertiesFile(target, key, value, false); 
+		request.setAttribute("message", "\"" + key + "\" is updated.");
 		
 	}
 	
