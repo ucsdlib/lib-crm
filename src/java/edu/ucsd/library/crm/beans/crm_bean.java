@@ -5,12 +5,15 @@ package edu.ucsd.library.crm.beans;
  * Created on June 26, 2002, 9:10 AM
  */
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.Format;
@@ -22,7 +25,7 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.SortedMap;
-
+import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -212,72 +215,77 @@ public class crm_bean {
 	/**
 	 * Method to change the properties file
 	 */
-	public int setPropertiesFile(String file, String name, String newValue) throws IOException
+	public void setPropertiesFile(String file, String name, String newValue, boolean newKey) throws IOException
 	{
-		 Properties myProp = null;
-		 Object o = null;
-		 String link = "";
-	        try {
-	        	link = pathToProperties.substring(0,pathToProperties.length()-22);
-	            myProp = FileUtils.loadProperties(link + file);
-	        } catch (IOException ioe) {
-	        	
-	        }  
-	        o = myProp.setProperty(name, newValue);
-	        String cmt;
-	        
-	        if(file.equals("employee_types.properties"))
-	       		cmt ="#Staff Group\n";
-	       	else 
-	       		cmt = "#\n#Wed Apr 09 15:47:59 PDT 2008\n";
-	        
-	        try {
-	            FileOutputStream fos = new FileOutputStream(link + file);
-	            myProp.store(fos, cmt);
-	            fos.close();
-	        } catch (FileNotFoundException fnfe) {
-	            return 2;
-	        } catch (IOException ioe) {
-	            return 3;
-	        }
-        if(o == null)
-        	return 0;
-        else
-        	return 1;
+      String lineIn = "", key = "", value = "";
+      BufferedReader in = null;
+      BufferedWriter out = null;
+      String[] strArray = null;
+      Map<String,String> sortedMap = null;
+      Map<String, String> propMap = new HashMap<String, String>();
+      try {
+          in = new BufferedReader(new FileReader(pathToProperties + "/"+file));
+          while (((lineIn = in.readLine()) != null) && !(lineIn.trim().equals(""))) {
+              lineIn = lineIn.trim();
+              strArray = lineIn.split("=");
+             
+              if(!propMap.containsKey(strArray[0].trim())) {
+                  if (lineIn.contains(name.trim()+"="))
+                      propMap.put(strArray[0].trim(), newValue.trim());
+                  else
+                      propMap.put(strArray[0].trim(), strArray[1].trim());
+              }
+          }
+          if (newKey) {
+              propMap.put(name.trim(), newValue.trim());
+          }
+          out = new BufferedWriter(new FileWriter(pathToProperties + "/"+file));
+          sortedMap = new TreeMap(propMap);
+          for (Iterator i = sortedMap.keySet().iterator(); i.hasNext();) {
+            key = (String) i.next();
+            value = sortedMap.get(key).toString();
+            out.write(key+"="+value+"\n");      
+          }
+      } catch (IOException ioe) {
+        System.out.println("Error loading properties file! - "+file);
+      } finally {
+          try { 
+              out.close();
+          } catch (Exception e) {}
+      }		
 	}
 	
-	public int delProperties(String file, String name) throws IOException
+	public void delProperties(String file, String name) throws IOException
 	{
-		Properties myProp = null;
-		 Object o = null;
-		 String link = "";
-	        try {
-	        	link = pathToProperties.substring(0,pathToProperties.length()-22);
-	            myProp = FileUtils.loadProperties(link + file);
-	        } catch (IOException ioe) {
-	        	
-	        }  
-	        o = myProp.remove(name);
-	        String cmt;
-	        
-	        if(file.equals("employee_types.properties"))
-	       		cmt ="#Staff Group\n";
-	       	else 
-	       		cmt = "#\n#Wed Apr 09 15:47:59 PDT 2008\n";
-	        
-	        try {
-	            FileOutputStream fos = new FileOutputStream(link + file);
-	            myProp.store(fos, cmt);
-	            fos.close();
-	        } catch (FileNotFoundException fnfe) {
-	            return 2;
-	        } catch (IOException ioe) {
-	            return 3;
-	        }
-       if(o == null)
-       	return 0;
-       else
-       	return 1;
+        String lineIn = "", key = "", value = "";
+        BufferedReader in = null;
+        BufferedWriter out = null;
+        String[] strArray = null;
+        Map<String,String> sortedMap = null;
+        Map<String, String> propMap = new HashMap<String, String>();
+        try {
+            in = new BufferedReader(new FileReader(pathToProperties + "/"+file));
+            while (((lineIn = in.readLine()) != null) && !(lineIn.trim().equals(""))) {
+                lineIn = lineIn.trim();
+                strArray = lineIn.split("=");
+                if((!lineIn.contains(name.trim()+"=")) && !propMap.containsKey(strArray[0].trim())) {
+                    propMap.put(strArray[0].trim(), strArray[1].trim());
+                }
+            }
+            out = new BufferedWriter(new FileWriter(pathToProperties + "/"+file));
+            sortedMap = new TreeMap(propMap);
+            for (Iterator i = sortedMap.keySet().iterator(); i.hasNext();) {
+              key = (String) i.next();
+              value = sortedMap.get(key).toString();
+              out.write(key+"="+value+"\n");      
+            }
+        } catch (IOException ioe) {
+          System.out.println("Error loading properties file! - "+file);
+        } finally {
+            try { 
+                out.close();
+            } catch (Exception e) {}
+        }
 	}
 	
 	
@@ -286,28 +294,31 @@ public class crm_bean {
 	 */
 	public Map getPropertiesSet(String file)  throws IOException
 	{
-		 
-		Properties props = null;
-		Object o = null;
-		String link = "";
-        try {
-        	link = pathToProperties.substring(0,pathToProperties.length()-22);
-        	props = FileUtils.loadProperties(link + file);
-        } catch (IOException ioe) {
-        	
-        } 
+        String lineIn = "";;
+        BufferedReader in = null;
+        String[] strArray = null;
         Map<String,String> sortedMap = null;
-        	Map<Integer, String> propMap = new HashMap<Integer, String>();
-  	    Enumeration e = props.propertyNames();
-  	    for (; e.hasMoreElements(); ) {
-  	        String propName = (String)e.nextElement();
-  	        int propKey = Integer.parseInt(propName);
-  	        String propValue = (String)props.get(propName);
-  	        if(propValue.length() < 5)
-  	        propMap.put(propKey, propValue);
-  	    }    
+        Map<String, String> propMap = new HashMap<String, String>();
+        try {
+          in = new BufferedReader(new FileReader(pathToProperties + "/"+file));
+          while (((lineIn = in.readLine()) != null)
+              && !(lineIn.trim().equals(""))) {
+              lineIn = lineIn.trim();
+              strArray = lineIn.split("=");
+              if (strArray.length > 2) {
+                  System.out.println("problem org:"+lineIn);
+              }
+              if(!propMap.containsKey(strArray[0].trim())) {
+                  propMap.put(strArray[0].trim(), strArray[1].trim());
+              } 
+          }
+          
+        } catch (IOException ioe) {
+            System.out.println("Error loading properties file!");
+        }        
+        
   	    sortedMap = new TreeMap(propMap);
-       return sortedMap;
+        return sortedMap;
 	}
 	
 	/**
@@ -315,18 +326,20 @@ public class crm_bean {
 	 */
 	public boolean hasPropertiesKey(String file, String key)throws IOException
 	{
-		Properties props = null;
-		Object o = null;
-		String link = "";
+        String lineIn = "";
+        BufferedReader in = null;
         try {
-        	link = pathToProperties.substring(0,pathToProperties.length()-22);
-        	props = FileUtils.loadProperties(link + file);
-        } catch (IOException ioe) {
-        	
+            in = new BufferedReader(new FileReader(pathToProperties + "/"+file));
+            while (((lineIn = in.readLine()) != null) && !(lineIn.trim().equals(""))) {
+                lineIn = lineIn.trim();
+                if (lineIn.contains(key.trim()+"="))
+                    return true;
+            }
+         } catch (IOException ioe) {
+            System.out.println("Error loading properties file!");
+            return false;
         } 
-        if(props.getProperty(key) == null)
-        	return false;
-        return true;
+        return false;
 	}
 	
     private String contextDir;

@@ -52,12 +52,12 @@ function getUrlVars() {
 	String col1 = "";
 	String col2 = "";
 	String col3 = "";
-	if(typ.equals("employee_types.properties"))
+	if(typ.equals("org_name_mapping.properties"))
 	{
-		listName = "Employee Types Properties";
-		col1 = "Staff";
-		col2 = "Group";
-		col3 = "New Group";
+		listName = "Org Name Properties";
+		col1 = "Department Name";
+		col2 = "LibAssignedName";
+		col3 = "New LibAssignedName";
 	}
 	String dLink = "downloadPropertiesServlet.do?fileName="+ typ;
 %>
