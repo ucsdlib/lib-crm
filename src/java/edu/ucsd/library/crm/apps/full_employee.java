@@ -66,10 +66,11 @@ public class full_employee {
 
 	/**
 	 * Write data out to the file
-	 * @param props1 Path to affilications properties file
-	 * @param fileToWrite Path to the file to write results to
+	 * @param propsOrgs Path to affilications properties file
+     * @param fileToWrite Path to the file to write results to
+	 * @param fileToRead Path to the file to read results from
 	 */
-	public static void grabData(String props1, String fileToWrite, String fileToRead) {
+	public static void grabData(String propsOrgs, String fileToWrite, String fileToRead) {
 
 		outputLocation = fileToWrite.substring(0, fileToWrite.lastIndexOf(File.separator) + 1);
 		
@@ -83,7 +84,7 @@ public class full_employee {
 					new BufferedOutputStream(
 						new FileOutputStream(fileToWrite)));
 
-			getRawData(props1, pw, fileToRead);
+			getRawData(propsOrgs, pw, fileToRead);
 
 			if (pw != null)
 				pw.close();
@@ -98,28 +99,18 @@ public class full_employee {
 
 	/**
 	 * Method to retreive data from database and output to raw file.
-	 * @param props1 Path to type codes properties file
-	 * @param fileToWrite Path to the file to write results to
+	 * @param propsOrgs Path to orgs name properties file
+	 * @param pw PrintWriter
+	 * @param fileToRead Path to the file to write results to
 	 */
-	public static void getRawData(String props1, PrintWriter pw, String fileToRead) {
+	public static void getRawData(String propsOrgs, PrintWriter pw, String fileToRead) {
 	    StringBuffer writeOut = new StringBuffer();
         String lineIn = "";;
         BufferedReader in = null;
         Map tmpMap = new HashMap();
         String[] strArray = null;
         try {
-            in = new BufferedReader(new FileReader(props1));
-            while (((lineIn = in.readLine()) != null)
-                && !(lineIn.trim().equals(""))) {
-                lineIn = lineIn.trim();
-                strArray = lineIn.split("=");
-                if (strArray.length > 2) {
-                    System.out.println("problem org:"+lineIn);
-                }
-                if(!tmpMap.containsKey(strArray[0].trim())) {
-                    tmpMap.put(strArray[0].trim(), strArray[1].trim());
-                } 
-            }
+            tmpMap = loadMapping(propsOrgs);
             in = new BufferedReader(new FileReader(fileToRead));
             while (((lineIn = in.readLine()) != null)
                 && !(lineIn.trim().equals(""))) {
@@ -150,6 +141,30 @@ public class full_employee {
 		    System.err.println("Exception in transforming csv file: " + e);
         } 
 	}
+	
+	public static Map loadMapping(String propsOrgs) {
+        String lineIn = "";;
+        BufferedReader in = null;
+        Map tmpMap = new HashMap();
+        String[] strArray = null;
+        try {
+            in = new BufferedReader(new FileReader(propsOrgs));
+            while (((lineIn = in.readLine()) != null)
+                && !(lineIn.trim().equals(""))) {
+                lineIn = lineIn.trim();
+                strArray = lineIn.split("=");
+                if (strArray.length > 2) {
+                    System.out.println("problem mapping:"+lineIn);
+                }
+                if(!tmpMap.containsKey(strArray[0].trim())) {
+                    tmpMap.put(strArray[0].trim(), strArray[1].trim());
+                } 
+            }
+        } catch (IOException ioe) {
+            System.out.println("Error loading properties file!");
+        }
+        return tmpMap;
+    }
 	private static String outputLocation;
 }
 
