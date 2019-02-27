@@ -9,6 +9,7 @@ package edu.ucsd.library.crm.apps;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -39,14 +40,19 @@ public class makecsv_employee {
 				new PrintWriter(
 					new BufferedOutputStream(
 						new FileOutputStream(fileToWrite)));
-
 			String lineIn = "";
 			Map tmpMap = new HashMap();
 			String[] strArray = null;
 			Vector tmpPhone = null, tmpTitle = null, tmpEmail = null, tmpDep = null, tmpMailCode = null, firstName = null, lastName = null; 
 	        String key = null, value = null;
 	        String[] dataArray = null;
-			writeToFileHeader(pw);
+	        Map apptTypeMap = new HashMap();
+            boolean hasApptType = false;
+            if (fileToRead.contains("transform")) {
+                hasApptType = true;
+                apptTypeMap = full_employee.loadMapping(propsFolder + File.separator + "appointment_mapping.properties");
+            }	        
+			writeToFileHeader(pw, hasApptType);
 			while (((lineIn = in.readLine()) != null)
 				&& !(lineIn.trim().equals(""))) {
 				lineIn = lineIn.trim();
@@ -93,6 +99,9 @@ public class makecsv_employee {
 			  			}
 
 			  			pw.write(lastName.get(0)+","+firstName.get(0));
+			  			if (hasApptType == true) {
+			  			    writeApptType(pw, apptTypeMap, tmpTitle);
+			  			}
 			  			writeDataToFile(pw, tmpTitle);
 			  			writeDataToFile(pw, tmpPhone);
 			  			writeDataToFile(pw, tmpEmail);
@@ -117,6 +126,19 @@ public class makecsv_employee {
 
 	}
 
+    private static void writeApptType(PrintWriter bw, Map apptTypeMap, Vector titleVec)  throws IOException{
+        String apptType = " ";
+        if (titleVec.size() > 0) {
+            apptType = titleVec.get(0).toString().trim();
+            if(apptTypeMap.containsKey(apptType)) {
+                apptType = (String)apptTypeMap.get(apptType);
+            } else {
+                apptType = " ";
+            }
+        } 
+        bw.write(","+apptType);	        
+    }
+	   
 	private static void writeDataToFile(PrintWriter bw, Vector input)  throws IOException{
 		for (int k = 0; k < input.size(); k++) {
 			bw.write(","+input.get(k).toString().replace("(null)", " "));
@@ -126,8 +148,12 @@ public class makecsv_employee {
 		}
 	}
 	
-	private static void writeToFileHeader(PrintWriter bw) {
-		bw.write("EMP_LAST_NAME,EMP_FIRST_NAME,APP_TITLE_NAME_1,APP_TITLE_NAME_2,APP_TITLE_NAME_3,APP_TITLE_NAME_4,APP_TITLE_NAME_5,PHONE_1,PHONE_2,PHONE_3,PHONE_4,PHONE_5,");
+	private static void writeToFileHeader(PrintWriter bw, boolean hasApptType) {
+		bw.write("EMP_LAST_NAME,EMP_FIRST_NAME,");
+		if (hasApptType == true) {
+		    bw.write("EMP_TYPE,");
+		}
+		bw.write("APP_TITLE_NAME_1,APP_TITLE_NAME_2,APP_TITLE_NAME_3,APP_TITLE_NAME_4,APP_TITLE_NAME_5,PHONE_1,PHONE_2,PHONE_3,PHONE_4,PHONE_5,");
 		bw.write("EMAIL_1,EMAIL_2,EMAIL_3,EMAIL_4,EMAIL_5,");
 		bw.write("APP_DEPARTMENT_NAME_1,APP_DEPARTMENT_NAME_2,APP_DEPARTMENT_NAME_3,APP_DEPARTMENT_NAME_4,APP_DEPARTMENT_NAME_5,");
 		bw.write("MAIL_CODE_1,MAIL_CODE_2,MAIL_CODE_3,MAIL_CODE_4,MAIL_CODE_5\n");
