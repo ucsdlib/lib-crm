@@ -32,7 +32,7 @@ Choose the File :
 <td>
 <form action="listProperties.jsp" method="get">
 <input type="hidden" name="target" value="appointment_mapping.properties"/>
-<input type="submit" value="Appointment Title File"/>
+<input type="submit" value="Appointment Type File"/>
 </form>
 </td>
 
