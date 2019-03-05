@@ -10,7 +10,18 @@
 <br>
 <h2>
 <font face="Verdana, Arial, sans-serif" size=2 class="fontNormal" color="#FFFFFF">
-<b>CSV file transformed!!</b>
+<%
+  if(crm.canTransform()) {
+%>
+<b>CSV File transformed!!</b>
+<%
+  } else {
+%>
+<b>CSV File Transform failed!!!</b><br/>
+<a href="downloadPropertiesServlet.do?fileName=missing_mapping.txt">Download missing mapping file</a>
+<%
+  }
+%>
 </font>
 </h2>
 

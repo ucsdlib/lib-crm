@@ -12,9 +12,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import edu.ucsd.library.shared.Mail;
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 
 public class transform_employee_file {
-
+    public static boolean isValid = false;
+  
 	/** Creates new create_employee_file */
 	public transform_employee_file() {
 	}
@@ -65,25 +69,37 @@ public class transform_employee_file {
 		        Calendar c =  Calendar.getInstance();
 		        String todayDatePart = formatter.format(c.getTime());
 
-                full_employee.grabData(org_name_mapping, args[0] + File.separator + "all_transform_employee.txt", 
-                    args[0] + File.separator + "all_active_employee.txt");
-				makecsv_employee.makeCsv(
+                isValid = full_employee.grabData(org_name_mapping, args[0] + File.separator + "all_transform_employee.txt", 
+                    args[0] + File.separator + "all_active_employee.txt", args[0] + File.separator + "missing_mapping.txt");
+				if(isValid) {
+                    makecsv_employee.makeCsv(
 							args[1],
 							args[0] + File.separator + "all_transform_employee.txt",
 							args[0] + File.separator + createFullCsvFileName());
 				
-				//Create incremental employees file
+				    //Create incremental employees file
 				
-				full_employee.grabData(org_name_mapping, args[0] + File.separator + "inc_transform_employee.txt", 
-                    args[0] + File.separator + "inc_all_employee.txt");
-				makecsv_employee.makeCsv(
-                    args[1],
-                    args[0] + File.separator + "inc_transform_employee.txt",
-                    args[0] + File.separator + createCsvFileName());
+				    full_employee.grabData(org_name_mapping, args[0] + File.separator + "inc_transform_employee.txt", 
+                        args[0] + File.separator + "inc_all_employee.txt", args[0] + File.separator + "missing_mapping.txt");
+				    makecsv_employee.makeCsv(
+                        args[1],
+                        args[0] + File.separator + "inc_transform_employee.txt",
+                        args[0] + File.separator + createCsvFileName());
+				} else {
+				    String emailAddress = "mstuart@ucsd.edu,ABarsh@ucsd.edu,hjsyoo@ucsd.edu,tchu@ucsd.edu";
+                    String[] email = emailAddress.split(",");
+	                String emailcontent = full_employee.getEmailContent(args[0] + File.separator + "missing_mapping.txt");
+	                String subject = "Lib-CRM Data Extract: New appointment titles or departments detected";
+	                try {
+	                     Mail.sendMail("no-reply@ucsd.edu", email, subject, emailcontent, "text/html; charset=utf-8", "smtp.ucsd.edu" );
+	                } catch (Exception e) {
+	                    e.printStackTrace();
+	                } 				  
+				}
 			} catch (Exception e) {
+			    e.printStackTrace();
 			}					
 		}
 		System.out.println("end");
 	}
-
 }

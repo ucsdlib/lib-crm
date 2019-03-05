@@ -27,43 +27,27 @@ public class downloadProperties extends HttpServlet {
  * @throws IOException if an error occurred 
  */  
 public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, FileNotFoundException  {  
-	 String fileName = request.getParameter("fileName");
-	 response.setContentType("text/plain"); 
-	 response.setHeader("Content-Disposition","attachment;filename=" + fileName);
-	 ServletContext ctx = getServletContext();
-	 String marcFilesDir = ctx.getInitParameter("marcFilePath");	 
-	 BufferedReader is = new BufferedReader(new FileReader(marcFilesDir + fileName));
-	 is.readLine();
-	 is.readLine();
-	 is.readLine();
-	 
-	 String lineIn;
-	 ServletOutputStream os = response.getOutputStream();  	 
-	 Map<String,String> sortedMap = null;	 
+	String fileName = request.getParameter("fileName");
+	response.setContentType("text/plain"); 
+	response.setHeader("Content-Disposition","attachment;filename=" + fileName);
+	ServletContext ctx = getServletContext();
+	String marcFilesDir = ctx.getInitParameter("marcFilePath");	 
+	ServletOutputStream os = response.getOutputStream();    
 
-    	 Map<String, String> propMap = new HashMap<String, String>();
-	 while((lineIn = is.readLine()) != null)
-	 {
-         String[] temp = lineIn.split("=");
-		 if(temp.length == 2)
-			 propMap.put(temp[0],temp[1]);
-		 else
-			 propMap.put(temp[0], "");
-	  }
-	  sortedMap = new TreeMap(propMap);
-		 
-	  Iterator it = sortedMap.entrySet().iterator();
-	  while(it.hasNext())
-	  {
-		  Map.Entry pairs = (Map.Entry)it.next();
-		  if(pairs.getKey().toString().length() > 0) {
-			  String temp2 = pairs.getKey().toString() + "=" + pairs.getValue() + "\n";
-		 	  os.write(temp2.getBytes());
-		   }
-	  }
-	 
-	  os.flush();  
-	  os.close(); 
+	if ((new File(marcFilesDir + fileName)).exists()) {
+        BufferedReader is = new BufferedReader(new FileReader(marcFilesDir + fileName));
+
+        int charRead = 0;
+       
+        while ((charRead = is.read()) != -1) {
+            os.print((char)charRead);  
+        }
+   
+        } else {
+            os.print("Error: filename not found!");
+        }	 
+	    os.flush();  
+	    os.close(); 
 	}
 }  
 
