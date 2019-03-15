@@ -211,6 +211,13 @@ public class crm_bean {
         tmp[1] = marcFilesDir;
         edu.ucsd.library.crm.apps.transform_employee_file.main(tmp);
     }
+
+    /**
+     * Method to validate data before transform it into csv file
+     */
+    public boolean canTransform() {
+        return edu.ucsd.library.crm.apps.transform_employee_file.isValid;
+    }
     
 	/**
 	 * Method to change the properties file
