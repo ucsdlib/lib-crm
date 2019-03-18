@@ -140,12 +140,7 @@ public class makecsv_employee {
     }
 	   
 	private static void writeDataToFile(PrintWriter bw, Vector input)  throws IOException{
-		for (int k = 0; k < input.size(); k++) {
-			bw.write(","+input.get(k).toString().replace("(null)", " "));
-		}
-		for (int i=input.size(); i < 5; i++) {
-			bw.write(", ");
-		}
+		bw.write(","+input.get(0).toString().replace("(null)", " "));
 	}
 	
 	private static void writeToFileHeader(PrintWriter bw, boolean hasApptType) {
@@ -153,10 +148,7 @@ public class makecsv_employee {
 		if (hasApptType == true) {
 		    bw.write("EMP_TYPE,");
 		}
-		bw.write("APP_TITLE_NAME_1,APP_TITLE_NAME_2,APP_TITLE_NAME_3,APP_TITLE_NAME_4,APP_TITLE_NAME_5,PHONE_1,PHONE_2,PHONE_3,PHONE_4,PHONE_5,");
-		bw.write("EMAIL_1,EMAIL_2,EMAIL_3,EMAIL_4,EMAIL_5,");
-		bw.write("APP_DEPARTMENT_NAME_1,APP_DEPARTMENT_NAME_2,APP_DEPARTMENT_NAME_3,APP_DEPARTMENT_NAME_4,APP_DEPARTMENT_NAME_5,");
-		bw.write("MAIL_CODE_1,MAIL_CODE_2,MAIL_CODE_3,MAIL_CODE_4,MAIL_CODE_5\n");
+		bw.write("APP_TITLE_NAME_1,PHONE_1,EMAIL_1,APP_DEPARTMENT_NAME_1,MAIL_CODE_1\n");
 	}
 	
 	/**
